@@ -1,1 +1,49 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  deploy:
+
+    runs-on: ububtu-latest
+
+    steps:
+
+    - uses: actions/checkout@4
+
+    - name: Login DockerHub
+      uses: docker/login-action@3
+      with:
+        username: ${{secrets.DOCKER_USERNAME}}
+        password: ${{secrets.DOCKER_PASSWORD}}
+
+    - name: Build Image
+      run: |
+        docker build -t vamshitelu/weather-agent:${{ github.sha }}
+
+    - name: Push Image
+      run: |
+        docker push vamshitelu/weather-agent:${{ github.sha }} 
+
+    - name: Configure kubectl
+      uses: aws/setup-kubectl@4
+
+    - name: Configure kubeconfig
+      run: |
+        mkdir -p ~/.kube
+        echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
+
+    - name: Update Deployment
+      run: |
+        kubectl set image deployment/weather-app \
+        weather=vamshitelu/weeather-agent:${{ github.sha }}
+
+    - name: Verify Rollout
+      run: |
+      kubectl rollout status deployment weather-app       
+
 
