@@ -6,28 +6,24 @@ on:
       - main
 
 jobs:
-
   deploy:
-
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout Source Code 
+        uses: actions/checkout@4
 
+      - name: Login DockerHub
+        uses: docker/login-action@3
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
 
-    - name: Checkout Source Code 
-      uses: actions/checkout@4
+      - name: Build Image
+        run: |
+          docker build -t vamshitelu/weather-agent:${{ github.sha }}
 
-    - name: Login DockerHub
-      uses: docker/login-action@3
-      with:
-        username: ${{secrets.DOCKER_USERNAME}}
-        password: ${{secrets.DOCKER_PASSWORD}}
-
-    - name: Build Image
-      run: |
-        docker build -t vamshitelu/weather-agent:${{ github.sha }}
-
-    - name: Push Image
-      run: |
-        docker push vamshitelu/weather-agent:${{ github.sha }} 
+      - name: Push Image
+        run: |
+          docker push vamshitelu/weather-agent:${{ github.sha }} 
 
