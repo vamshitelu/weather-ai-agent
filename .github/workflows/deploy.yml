@@ -9,7 +9,7 @@ jobs:
 
   deploy:
 
-    runs-on: ububtu-latest
+    runs-on: ubuntu-latest
 
     steps:
 
