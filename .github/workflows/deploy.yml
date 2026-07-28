@@ -21,10 +21,12 @@ jobs:
 
       - name: Build Image
         run: |
+          docker build -t ${{secrets.DOCKER_USERNAME}}/weather-agent:latest \
           docker build -t ${{secrets.DOCKER_USERNAME}}/weather-agent:${{ github.sha }} .
 
       - name: Push Image
         run: |
+          docker push ${{secrets.DOCKER_USERNAME}}/weather-agent:latest
           docker push ${{secrets.DOCKER_USERNAME}}/weather-agent:${{ github.sha }} 
 
       - name: Copy Kubernetes Manifests
