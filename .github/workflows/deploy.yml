@@ -27,3 +27,28 @@ jobs:
         run: |
           docker push ${{secrets.DOCKER_USERNAME}}/weather-agent:${{ github.sha }} 
 
+      - name: Copy Kubernetes Manifests
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{secrets.EC2_HOST}}
+          username: ${{secrets.EC2_USERNAME}}
+          key: ${{secrets.EC2_SSH_KEY}}
+          source: "k8s/*"
+          target: "/home/ubuntu"
+
+      - name: Deploy to K3s
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{secrets.EC2_HOST}}
+          username: ${{secrets.EC2_USERNAME}}
+          key: ${{secrets.EC2_SSH_KEY}}
+          scripts: |
+            cd /home/ubuntu/k8s
+
+            kubectl apply -f deployment.yaml
+            kubectl apply -f service.yaml
+
+            kubectl set image deployment/weather-agent \
+              weather-agent=${{secrets.DOCKER_USERNAME}}/weather-agent:${{github.sha}}
+
+            kubectl rollout status deployment/weather-agent
