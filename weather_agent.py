@@ -7,6 +7,7 @@ Flow: user message -> LLM (Groq, Google, OpenRouter, OpenAI) decides whether to 
 
 from typing import Annotated, TypedDict
 
+import os
 import requests
 from langchain_groq import ChatGroq
 from langchain_core.messages import BaseMessage
@@ -70,7 +71,8 @@ class AgentState(TypedDict):
 
 
 def build_graph():
-    llm = ChatGroq(model="qwen/qwen3.6-27b", temperature=0)
+    groq_model = os.getenv("GROQ_MODEL", "qwen/qwen3.6-27b")
+    llm = ChatGroq(model=groq_model, temperature=0)
     tools = [get_weather]
     llm_with_tools = llm.bind_tools(tools)
 
