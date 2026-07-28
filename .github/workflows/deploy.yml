@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout Source Code 
-        uses: actions/checkout@4
+        uses: actions/checkout@3
 
       - name: Login DockerHub
         uses: docker/login-action@3
